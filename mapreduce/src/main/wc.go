@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 // The map function is called once for each file of input! The first
@@ -15,24 +16,20 @@ import (
 // of key/value pairs.
 func mapF(filename string, contents string) []mapreduce.KeyValue {
 	// Your code here (Part #1B).
-	split_contents := strings.Fields(contents)
+
+	f := func(c rune) bool {
+		return unicode.IsSpace(c) || unicode.IsPunct(c) || unicode.IsSymbol(c)
+	}
+
+	split_contents := strings.FieldsFunc(contents, f)
 	kv := make([]mapreduce.KeyValue, 0)
 
 	for _, word := range split_contents {
+		word = strings.ToLower(word)
 		kv = append(kv, mapreduce.KeyValue{Key: word, Value: "1"})
 	}
 
-	// for _, word := range split_contents {
-	// 	for _, test := range kv {
-	// 		if test.Key == word {
-	// 			int_value, _ := strconv.Atoi(test.Value)
-	// 			test.Value = strconv.Itoa(int_value + 1)
-	// 		} else {
-	// 			kv = append(kv, mapreduce.KeyValue{Key: word, Value: "1"})
-	// 		}
-
-	// 	}
-	// }
+	fmt.Print(kv)
 	return kv
 }
 
@@ -41,12 +38,7 @@ func mapF(filename string, contents string) []mapreduce.KeyValue {
 // any map task.
 func reduceF(key string, values []string) string {
 	// Your code here (Part #1B).
-	var total int
-	for i := 0; i < len(values); i++ {
-		total += 1
-
-	}
-	return strconv.Itoa(total)
+	return strconv.Itoa(len(values))
 }
 
 // Can be run in 3 ways:
